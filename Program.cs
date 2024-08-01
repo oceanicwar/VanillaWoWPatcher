@@ -23,13 +23,20 @@ internal class Program
 
         patches.Add(new TrustedDomainPatch("oceanicwar.com"));
 
-        using var fs = new FileStream(file, FileMode.Open, FileAccess.ReadWrite);
+        File.Copy(file, @"./WoW-patched.exe");
+        using var fs = new FileStream(@"./wow-patched.exe", FileMode.Open, FileAccess.ReadWrite);
 
         ConsoleHelper.PrintColor("Patching WoW.exe..", ConsoleColor.White);
 
         foreach(var patch in patches)
         {
             ConsoleHelper.PrintColor($"Running '{patch.Name}' patch..", ConsoleColor.White);
+
+            if(patch.IsPatched(fs).Success)
+            {
+                ConsoleHelper.PrintColor($"WoW.exe is already patched with '{patch.Name}'.", ConsoleColor.Yellow);
+                continue;
+            }
 
             var result = patch.Patch(fs);
             if(!result.Success)
@@ -39,6 +46,7 @@ internal class Program
             }
         }
 
-        ConsoleHelper.PrintColor("Done patching.", ConsoleColor.White);
+        ConsoleHelper.PrintColor("Done patching, press ENTER to exit.", ConsoleColor.White);
+        Console.ReadLine();
     }
 }

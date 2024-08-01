@@ -11,6 +11,7 @@ internal class TrustedDomainPatch : IPatch
     private const uint offsetLength = 21;
 
     private string domain;
+    private readonly string originalDomain = "*.blizzard-europe.com";
 
     public TrustedDomainPatch(string domain)
     {
@@ -19,27 +20,76 @@ internal class TrustedDomainPatch : IPatch
 
     public PatchResult Patch(FileStream fs)
     {
-        if (domain.Length > offsetLength)
+        try
         {
-            return new PatchResult(false, $"Domain '{domain}' was too long. It must be between 1-{offsetLength} characters.");
-        }
-
-        fs.Position = offset;
-
-        foreach (var c in domain)
-        {
-            fs.WriteByte((byte)c);
-        }
-
-        if (domain.Length < offsetLength)
-        {
-            var diff = offsetLength - domain.Length;
-            for (int i = 0; i < diff; i++)
+            if (domain.Length > offsetLength)
             {
-                fs.WriteByte(0x00);
+                return new PatchResult(false, $"Domain '{domain}' was too long. It must be between 1-{offsetLength} characters.");
             }
-        }
 
-        return new PatchResult(true);
+            fs.Position = offset;
+
+            foreach (var c in domain)
+            {
+                fs.WriteByte((byte)c);
+            }
+
+            if (domain.Length < offsetLength)
+            {
+                var diff = offsetLength - domain.Length;
+                for (int i = 0; i < diff; i++)
+                {
+                    fs.WriteByte(0x00);
+                }
+            }
+
+            return new PatchResult(true);
+        }
+        catch(Exception ex)
+        {
+            return new PatchResult(false, $"{ex.Message}: {ex.StackTrace}");
+        }
+    }
+
+    public PatchResult Unpatch(FileStream fs)
+    {
+        try
+        {
+            fs.Position = offset;
+
+            foreach (var c in originalDomain)
+            {
+                fs.WriteByte((byte)c);
+            }
+
+            return new PatchResult(true);
+        }
+        catch (Exception ex)
+        {
+            return new PatchResult(false, $"{ex.Message}: {ex.StackTrace}");
+        }
+    }
+
+    public PatchResult IsPatched(FileStream fs)
+    {
+        try
+        {
+            fs.Position = offset;
+
+            for(int i = 0; i < offsetLength; i++)
+            {
+                var b = fs.ReadByte();
+                if((char)b != originalDomain[i])
+                {
+                    return new PatchResult(true);
+                }
+            }
+
+            return new PatchResult(false);
+        }
+        catch (Exception ex)
+        {
+            return new PatchResult(false, $"{ex.Message}: {ex.StackTrace}");
+        }
     }
 }
