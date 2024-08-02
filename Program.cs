@@ -22,7 +22,8 @@ internal class Program
         var patches = new List<IPatch>()
         {
             new TrustedDomainPatch("oceanicwar.com"),
-            new LargeAddressAwarePatch()
+            new LargeAddressAwarePatch(),
+            new SignatureChecks()
         };
 
         File.Copy(file, @"./WoW-patched.exe");
