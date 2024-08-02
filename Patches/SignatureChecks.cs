@@ -1,4 +1,6 @@
-﻿namespace VanillaWoWPatcher.Patches;
+﻿using VanillaWoWPatcher.Utilities;
+
+namespace VanillaWoWPatcher.Patches;
 
 internal class SignatureChecks : IPatch
 {
@@ -30,7 +32,7 @@ internal class SignatureChecks : IPatch
             {
                 fs.Position = p.Key;
 
-                if(p.Value.Item1 != fs.ReadByte())
+                if(fs.ReadByte() != p.Value.Item1)
                 {
                     return new PatchResult(true);
                 }
@@ -48,10 +50,14 @@ internal class SignatureChecks : IPatch
     {
         try
         {
-            foreach(var p in data)
+            foreach (var entry in data)
             {
-                fs.Position = p.Key;
-                fs.WriteByte(p.Value.Item2);
+                ConsoleHelper.PrintColor($"> Writing to address '0x{entry.Key:X2}' with value '0x{entry.Value.Item2:X2}'.", ConsoleColor.Gray);
+
+                fs.Position = entry.Key;
+                fs.WriteByte(entry.Value.Item2);
+
+                fs.Flush();
             }
 
             return new PatchResult(true);
@@ -70,6 +76,8 @@ internal class SignatureChecks : IPatch
             {
                 fs.Position = p.Key;
                 fs.WriteByte(p.Value.Item1);
+
+                fs.Flush();
             }
 
             return new PatchResult(true);

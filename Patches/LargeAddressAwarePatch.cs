@@ -65,6 +65,8 @@ internal class LargeAddressAwarePatch : IPatch
             var newFlags = originalFlags | (ushort)Characteristics.IMAGE_FILE_LARGE_ADDRESS_AWARE;
             fs.Write(BitConverter.GetBytes(newFlags), 0, offsetLength);
 
+            fs.Flush();
+
             return new PatchResult(true);
         }
         catch (Exception ex)
@@ -80,6 +82,8 @@ internal class LargeAddressAwarePatch : IPatch
             fs.Position = offset;
 
             fs.Write(BitConverter.GetBytes(originalFlags), 0, offsetLength);
+
+            fs.Flush();
 
             return new PatchResult(true);
         }

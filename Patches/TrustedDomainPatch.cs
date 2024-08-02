@@ -32,6 +32,8 @@ internal class TrustedDomainPatch : IPatch
             foreach (var c in domain)
             {
                 fs.WriteByte((byte)c);
+
+                fs.Flush();
             }
 
             if (domain.Length < offsetLength)
@@ -40,6 +42,8 @@ internal class TrustedDomainPatch : IPatch
                 for (int i = 0; i < diff; i++)
                 {
                     fs.WriteByte(0x00);
+
+                    fs.Flush();
                 }
             }
 
@@ -60,6 +64,8 @@ internal class TrustedDomainPatch : IPatch
             foreach (var c in originalDomain)
             {
                 fs.WriteByte((byte)c);
+
+                fs.Flush();
             }
 
             return new PatchResult(true);
