@@ -2,7 +2,7 @@
 
 namespace VanillaWoWPatcher.Patches;
 
-internal class SignatureChecks : IPatch
+internal class SignatureChecksPatch : IPatch
 {
     /* Disables signature checks for the game files.
      * Without this you cannot modify the game files.

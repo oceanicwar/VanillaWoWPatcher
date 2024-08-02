@@ -23,7 +23,7 @@ internal class Program
         {
             new TrustedDomainPatch("oceanicwar.com"),
             new LargeAddressAwarePatch(),
-            new SignatureChecks()
+            new SignatureChecksPatch()
         };
 
         File.Copy(file, @"./WoW-patched.exe");
