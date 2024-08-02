@@ -5,8 +5,6 @@ namespace VanillaWoWPatcher;
 
 internal class Program
 {
-    static List<IPatch> patches = new List<IPatch>();
-
     static void Main(string[] args)
     {
         if(args.Length < 1)
@@ -21,7 +19,11 @@ internal class Program
             return;
         }
 
-        patches.Add(new TrustedDomainPatch("oceanicwar.com"));
+        var patches = new List<IPatch>()
+        {
+            new TrustedDomainPatch("oceanicwar.com"),
+            new LargeAddressAwarePatch()
+        };
 
         File.Copy(file, @"./WoW-patched.exe");
         using var fs = new FileStream(@"./wow-patched.exe", FileMode.Open, FileAccess.ReadWrite);
